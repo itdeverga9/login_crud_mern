@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import schemaOptions from "./schemaOptions.js";
 import crypto from "crypto";
 
-const User = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -22,10 +22,10 @@ const User = new mongoose.Schema(
     schemaOptions
 )
 
-User.methods.setPassword = function (password) {
+UserSchema.methods.setPassword = function (password) {
     this.salt = crypto.randomBytes(16).toString("hex");
 
-    this.password = crypto.pbkdf2Sync(
+    return this.password = crypto.pbkdf2Sync(
         password,
         this.salt,
         1000,
@@ -34,7 +34,7 @@ User.methods.setPassword = function (password) {
     ).toString("hex");
 }
 
-User.methods.validPassword = function (password) {
+UserSchema.methods.validPassword = function (password) {
     const hash = crypto.pbkdf2Sync(
         password,
         this.salt,
@@ -42,7 +42,11 @@ User.methods.validPassword = function (password) {
         64,
         "sha512"
     ).toString("hex");
+    // console.log(this.password === hash);
     return this.password === hash;
 }
 
-export default mongoose.model("User", User)
+
+const userModel = mongoose.model("User", UserSchema);
+
+export default userModel;

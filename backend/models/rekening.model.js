@@ -21,4 +21,4 @@ const Rekening = new mongoose.Schema(
     schemaOptions
 )
 
-export default mongoose.models("Rekening", Rekening)
+export default mongoose.model("Rekening", Rekening)

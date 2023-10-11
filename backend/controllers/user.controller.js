@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js"
 import jsonwebtoken from "jsonwebtoken"
 import responseHandler from "../handlers/response.handler.js"
+import crypto from "crypto"
 
 const signup = async (req, res) => {
     try {
@@ -10,7 +11,7 @@ const signup = async (req, res) => {
 
         if (checkUser) return responseHandler.badrequest(res, 'username sudah ada.')
 
-        const user = userModel;
+        const user = userModel();
 
         user.username = username;
         user.setPassword(password);
@@ -23,13 +24,13 @@ const signup = async (req, res) => {
             { expiresIn: "24h" }
         )
 
-        responseHandler.created(res, {
+        return responseHandler.created(res, {
             token,
             ...user._doc,
             id: user.id
         })
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
@@ -41,7 +42,7 @@ const signin = async (req, res) => {
 
         if (!user) return responseHandler.badrequest(res, 'User tidak ditemukan');
 
-        if (!user.validPassword(password)) responseHandler.badrequest(res, 'Password salah');
+        if (!user.validPassword(password)) return responseHandler.badrequest(res, 'Password salah');
 
         const token = jsonwebtoken.sign(
             { data: user.id },
@@ -52,33 +53,34 @@ const signin = async (req, res) => {
         user.password = undefined;
         user.salt = undefined;
 
-        responseHandler.created(res, {
+        return responseHandler.created(res, {
             token,
             ...user._doc,
             id: user.id
         })
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
 const updatePassword = async (req, res) => {
     try {
-        const { password, newPasswords } = req.body;
+        const { password, newPassword } = req.body;
 
         const user = await userModel.findById(req.user.id).select('password id salt');
 
         if (!user) return responseHandler.unauthorize(res);
 
-        if (!user.validPassword(password)) responseHandler.badrequest(res, 'Password salah');
+        if (!user.validPassword(password)) return responseHandler.badrequest(res, 'Password salah');
 
-        user.setPassword(newPasswords)
-
+        // console.log(user.validPassword(password));
+        // console.log(newPassword);
+        user.setPassword(newPassword)
         await user.save();
 
-        responseHandler.ok(res)
+        return responseHandler.ok(res)
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
@@ -88,9 +90,9 @@ const getInfo = async (req, res) => {
 
         if (!user) return responseHandler.unauthorize(res);
 
-        responseHandler.ok(res, user)
+        return responseHandler.ok(res, user)
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 

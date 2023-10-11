@@ -5,7 +5,7 @@ const addRekening = async (req, res) => {
     try {
         const cekRekening = await rekeningModel.findOne(req.body.no_rek);
 
-        if (cekRekening) responseHandler.badrequest(req, 'nomor rekening sudah ada.');
+        if (cekRekening) return responseHandler.badrequest(req, 'nomor rekening sudah ada.');
 
         const rekening = rekeningModel({
             ...req.body
@@ -13,59 +13,60 @@ const addRekening = async (req, res) => {
 
         await rekening.save();
 
-        responseHandler.created(res, rekening)
+        return responseHandler.created(res, rekening)
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
 const updateRekening = async (req, res) => {
     try {
+        const { id } = req.params;
         const { no_rek, nominal } = req.body;
 
-        const rekening = await rekeningModel.findOne({ no_rek: no_rek });
+        const rekening = await rekeningModel.findById({ id });
 
-        if (!rekening) responseHandler.badrequest(res, 'Rekeninig tidak ada.');
+        if (!rekening) return responseHandler.badrequest(res, 'Rekeninig tidak ada.');
 
         rekening.no_rek = no_rek;
         rekening.nominal = nominal;
 
         await rekening.save();
 
-        responseHandler.ok(res, rekening);
+        return responseHandler.ok(res, rekening);
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
 const deleteRekening = async (req, res) => {
     try {
-        const { no_rek } = req.body;
+        const id = req.params.id;
 
-        const remove = await rekeningModel.findOne({ no_rek: no_rek });
+        const remove = await rekeningModel.findOne({ id });
 
-        if (!remove) responseHandler.badrequest(res, 'Rekeninig tidak ada, tidak ada yang dihapus.');
+        if (!remove) return responseHandler.badrequest(res, 'Rekeninig tidak ada, tidak ada yang dihapus.');
 
         await remove.remove();
 
-        responseHandler.ok(res);
+        return responseHandler.ok(res);
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
 const getRekeningByNasabah = async (req, res) => {
     try {
-        const { id_nasabah } = req.body;
+        const { id } = req.params;
 
-        const rekening = await rekeningModel.find({ nasabah: id_nasabah }).populate("Nasabah");
+        const rekening = await rekeningModel.find({ nasabah: id }).populate("Nasabah");
 
-        if (!rekening) responseHandler.badrequest(res, 'Rekening tidak ditemukan');
+        if (!rekening) return responseHandler.badrequest(res, 'Rekening tidak ditemukan');
 
-        responseHandler.ok(res, rekening);
+        return responseHandler.ok(res, rekening);
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
-export default { addRekening, updateRekening, deleteRekening, getRekening }
+export default { addRekening, updateRekening, deleteRekening, getRekeningByNasabah }

@@ -1,4 +1,5 @@
 import nasabahModel from "../models/nasabah.model.js"
+import rekeningModel from "../models/rekening.model.js"
 import responseHandler from "../handlers/response.handler.js"
 
 const addNasabah = async (req, res) => {
@@ -13,19 +14,20 @@ const addNasabah = async (req, res) => {
 
         await nasabah.save();
 
-        responseHandler.created(res, nasabah)
+        return responseHandler.created(res, nasabah)
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
 const updateNasabah = async (req, res) => {
     try {
-        const { nama, alamat, telp, id } = req.body;
+        const { id } = req.params;
+        const { nama, alamat, telp } = req.body;
 
         const nasabah = nasabahModel.findOne({ id });
 
-        if (!nasabah) responseHandler.badrequest(res, 'Nasabah tidak ditemukan');
+        if (!nasabah) return responseHandler.badrequest(res, 'Nasabah tidak ditemukan');
 
         nasabah.nama = nama;
         nasabah.alamat = alamat;
@@ -33,23 +35,25 @@ const updateNasabah = async (req, res) => {
 
         await nasabah.save();
 
-        responseHandler.created(res, nasabah)
+        return responseHandler.created(res, nasabah)
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
 const deleteNasabah = async (req, res) => {
     try {
-        const { id } = req.body
+        const { id } = req.params
 
         const nasabah = await nasabahModel.findByIdAndRemove({ id });
 
-        if (!nasabah) responseHandler.badrequest(res, 'Nasabah tidak ditemukan')
+        if (!nasabah) return responseHandler.badrequest(res, 'Nasabah tidak ditemukan')
 
-        responseHandler.ok(res);
+        const rekening = await rekeningModel.deleteMany({ id });
+
+        return responseHandler.ok(res);
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
@@ -57,11 +61,11 @@ const getAllNasabah = async (req, res) => {
     try {
         const nasabah = await nasabahModel.find({})
 
-        if (!nasabah) responseHandler.badrequest(res, 'Nasabah kosong.');
+        if (!nasabah) return responseHandler.badrequest(res, 'Nasabah kosong.');
 
-        responseHandler.ok(res, nasabah)
+        return responseHandler.ok(res, nasabah)
     } catch {
-        responseHandler.error(res)
+        return responseHandler.error(res)
     }
 }
 
