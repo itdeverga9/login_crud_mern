@@ -9,6 +9,10 @@ const router = express.Router();
 
 router.post(
   "/signup",
+  async (req, res, next) => {
+    console.log(req.body);
+    next();
+  },
   body("username")
     .exists()
     .withMessage("username is required")
@@ -23,22 +27,26 @@ router.post(
     .withMessage("password is required")
     .isLength({ min: 6 })
     .withMessage("password minimum is 6 characters"),
-  body("confirmPassword")
-    .exists()
-    .withMessage("confirmPassword is required")
-    .isLength({ min: 6 })
-    .withMessage("confirmPassword minimum 8 characters")
-    .custom((value, { req }) => {
-      if (value !== req.body.password)
-        throw new Error("confirmPassword not match");
-      return true;
-    }),
+  // body("confirmPassword")
+  //   .exists()
+  //   .withMessage("confirmPassword is required")
+  //   .isLength({ min: 6 })
+  //   .withMessage("confirmPassword minimum 8 characters")
+  //   .custom((value, { req }) => {
+  //     if (value !== req.body.password)
+  //       throw new Error("confirmPassword not match");
+  //     return true;
+  //   }),
   requestHandler.validate,
   userController.signup
 );
 
 router.post(
   "/signin",
+  async (req, res, next) => {
+    console.log(req.body);
+    next();
+  },
   body("username")
     .exists()
     .withMessage("username is required")

@@ -1,20 +1,31 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import Topbar from "./Topbar";
-import LogoutModal from "./LogoutModal";
-import Footer from "./Footer";
-import { useSelector } from "react-redux";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import Footer from "../components/Footer";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
+import userApi from "../api/modules/authApi";
+import { setUser } from "../redux/features/userSlice";
 
 const Layout = () => {
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
+
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user]);
+    const authUser = async () => {
+      const { response, err } = await userApi.getInfo();
+
+      if (response) dispatch(setUser(response));
+      if (err) {
+        dispatch(setUser(null));
+        navigate("/login");
+      }
+    };
+
+    authUser();
+  }, [dispatch, navigate]);
 
   return (
     <>
@@ -32,7 +43,6 @@ const Layout = () => {
       <a className="scroll-to-top rounded" href="#page-top">
         <i className="fas fa-angle-up"></i>
       </a>
-      <LogoutModal />
     </>
   );
 };
