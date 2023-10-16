@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setUser } from "../redux/features/userSlice";
 import authApi from "../api/modules/authApi";
 import { useNavigate } from "react-router-dom";
@@ -10,8 +10,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // const { user } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,13 +27,6 @@ const Login = () => {
 
     authUser();
   }, [dispatch, navigate]);
-
-  // useEffect(() => {
-  //   console.log(user);
-  //   if (user) {
-  //     navigate("/");
-  //   }
-  // }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -16,7 +16,6 @@ function App() {
           <Route path="/nasabah" element={<Nasabah />} />
           <Route path="/rekening" element={<Rekening />} />
           <Route path="/users" element={<Users />} />
-          {/* <Route path="/user" element={<User />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>

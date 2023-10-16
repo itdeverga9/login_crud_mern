@@ -1,16 +1,14 @@
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/features/userSlice";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
-import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
 import userApi from "../api/modules/authApi";
-import { setUser } from "../redux/features/userSlice";
 
 const Layout = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.user);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +34,6 @@ const Layout = () => {
             <Topbar />
             <Outlet />
           </div>
-
           <Footer />
         </div>
       </div>
